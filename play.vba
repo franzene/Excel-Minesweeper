@@ -42,28 +42,31 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
             Call ClearBoard
             Call GenerateRandom
             Call setCellNumbers(Size)
-            'Call Test
-            Flags = 10
+            Call Test
+            Flags = Cells(4, 1).Value
             Cells(2, 1).Value = Flags
+            Call Test
             Running = True
         ElseIf Not Intersect(Target, Range("A3")) Is Nothing Then
             If Cells(3, 1).Value = "9 x 9" Then
                 Cells(3, 1).Value = "16 x 16"
+                Cells(4, 1).Value = "40"
             ElseIf Cells(3, 1).Value = "16 x 16" Then
-                Cells(3, 1).Value = "32 x 32"
-            ElseIf Cells(3, 1).Value = "32 x 32" Then
+                Cells(3, 1).Value = "30 x 16"
+                Cells(4, 1).Value = "99"
+            ElseIf Cells(3, 1).Value = "30 x 16" Then
                 Cells(3, 1).Value = "9 x 9"
+                Cells(4, 1).Value = "10"
             End If
         End If
-        
     End If
 End Sub
 
 Private Sub ClearBoard()
     Dim x As Integer
     Dim y As Integer
-    x = CInt(Left(Cells(3, 1).Value, InStr(Cells(3, 1).Value, "x") - 1))
-    y = CInt(Right(Cells(3, 1).Value, InStr(Cells(3, 1).Value, "x") - 1))
+    y = CInt(Left(Cells(3, 1).Value, InStr(Cells(3, 1).Value, "x") - 1))
+    x = CInt(Right(Cells(3, 1).Value, InStr(Cells(3, 1).Value, "x") - 1))
     Set Size = Range(Cells(2, 2), Cells(x + 1, y + 1))
 
     Worksheets("Sheet1").Protect "Password", UserInterfaceOnly:=True
@@ -73,17 +76,20 @@ Private Sub ClearBoard()
     Worksheets("Sheet1").Range("B1:AH34").Cells.RowHeight = 25
     Worksheets("Sheet1").Range("B1:AH34").Cells.ColumnWidth = 5
     Worksheets("Sheet1").EnableOutlining = True
-    
+    Worksheets("Sheet1").Cells.Font.Name = "Arial Black"
+    Worksheets("Sheet1").Range("A1:A10").Font.Name = "Calibri"
+    Worksheets("Sheet1").Cells.HorizontalAlignment = xlCenter
+    Worksheets("Sheet1").Cells.VerticalAlignment = xlCenter
     Size.Borders.LineStyle = xlContinuous
     Size.Interior.ColorIndex = 15
     Size.NumberFormat = ";;;"
     Size.FormulaHidden = True
+    
 
-    'Debug.Print x & ":" & y
 End Sub
 
 Private Sub Test()
-    Cells(2, 1).Value = Bombs.Count
+    Debug.Print Bombs.Count & " - " & Cells(4, 1).Value
 End Sub
 
 Private Sub GenerateRandom()
@@ -97,14 +103,12 @@ Private Sub GenerateRandom()
     Dim Num As Integer
     
     Set Bombs = New Collection
-    Num = 9
-    For i = 0 To 9
-        x = (9 - 1) * Rnd() + 2
-        y = (9 - 1) * Rnd() + 2
-        Debug.Print x & ":" & y
+    Num = Cells(4, 1).Value
+    For i = 1 To Num
+        x = (Size.Rows.Count - 1) * Rnd() + 2
+        y = (Size.Columns.Count - 1) * Rnd() + 2
         If Cells(x, y).Value = "" Then
             Set r = Worksheets("Sheet1").Range(Cells(x, y).Address)
-            'r.Cells.Interior.ColorIndex = 38'
             Bombs.Add r
         Else
             Num = Num + 1
@@ -238,7 +242,7 @@ Private Function showRange(Target As Range) As Boolean
     openedNew = False
     
     For Each tCell In Target.Cells
-        If Not tCell.Cells.Column = 1 And Not tCell.Cells.Row = 1 And Not tCell.Cells.Row = 12 And Not tCell.Cells.Column = 12 And Not isOpen(tCell) Then
+        If Not Application.Intersect(tCell, Size) Is Nothing And Not isOpen(tCell) Then
             tCell.NumberFormat = "General"
             tCell.Interior.ColorIndex = 16
             openedNew = True
@@ -269,3 +273,4 @@ Private Function openAllEmpty()
     
     
 End Function
+
