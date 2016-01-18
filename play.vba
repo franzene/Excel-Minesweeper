@@ -109,6 +109,7 @@ Private Sub GenerateRandom()
         y = (Size.Columns.Count - 1) * Rnd() + 2
         If Cells(x, y).Value = "" Then
             Set r = Worksheets("Sheet1").Range(Cells(x, y).Address)
+            r.Cells.Value = "B"
             Bombs.Add r
         Else
             Num = Num + 1
@@ -273,4 +274,3 @@ Private Function openAllEmpty()
     
     
 End Function
-
