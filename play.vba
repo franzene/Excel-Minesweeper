@@ -2,6 +2,7 @@ Dim Bombs As Collection
 Dim Running As Boolean
 Dim Flags As Integer
 Dim Size As Range
+Dim sizeBtn As Button
 Option Explicit
 
 Private Sub Worksheet_BeforeDoubleClick(ByVal Target As Range, Cancel As Boolean)
@@ -35,31 +36,68 @@ Cancel = True
         
     End If
 End Sub
+Sub startFunctions()
+Debug.Print "startFunctions"
+     Call ClearBoard
+     Call GenerateRandom
+     Call setCellNumbers(Size)
+     Call Test
+     Flags = Cells(4, 1).Value
+     Cells(2, 1).Value = Flags
+     Call Test
+     Running = True
+End Sub
 
+Sub setSize()
+    If Cells(3, 1).Value = "9 x 9" Then
+        Cells(3, 1).Value = "16 x 16"
+        Cells(4, 1).Value = "40"
+        sizeBtn.Caption = Cells(3, 1).Text
+    ElseIf Cells(3, 1).Value = "16 x 16" Then
+        Cells(3, 1).Value = "30 x 16"
+        Cells(4, 1).Value = "99"
+        sizeBtn.Caption = Cells(3, 1).Text
+    Else
+        Cells(3, 1).Value = "9 x 9"
+        Cells(4, 1).Value = "10"
+        sizeBtn.Caption = Cells(3, 1).Text
+    End If
+End Sub
 Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     If Selection.Count = 1 Then
-        If Not Intersect(Target, Range("A1")) Is Nothing Then
-            Call ClearBoard
-            Call GenerateRandom
-            Call setCellNumbers(Size)
-            Call Test
-            Flags = Cells(4, 1).Value
-            Cells(2, 1).Value = Flags
-            Call Test
-            Running = True
-        ElseIf Not Intersect(Target, Range("A3")) Is Nothing Then
-            If Cells(3, 1).Value = "9 x 9" Then
-                Cells(3, 1).Value = "16 x 16"
-                Cells(4, 1).Value = "40"
-            ElseIf Cells(3, 1).Value = "16 x 16" Then
-                Cells(3, 1).Value = "30 x 16"
-                Cells(4, 1).Value = "99"
-            ElseIf Cells(3, 1).Value = "30 x 16" Then
-                Cells(3, 1).Value = "9 x 9"
-                Cells(4, 1).Value = "10"
-            End If
+        If Not Intersect(Target, Range("A3")) Is Nothing Then
+           
         End If
     End If
+End Sub
+
+Sub addButtons()
+    Dim startBtn As Button
+    Application.ScreenUpdating = False
+    ActiveSheet.Buttons.Delete
+    Dim t As Range
+    Set t = ActiveSheet.Range(Cells(1, 1), Cells(1, 1))
+    Set startBtn = ActiveSheet.Buttons.Add(t.Left, t.Top, t.Width, t.Height)
+    With startBtn
+      .OnAction = "Sheet1.startFunctions"
+      .Caption = "Start"
+      .Name = "startFunctions"
+    End With
+    
+    
+
+    Application.ScreenUpdating = False
+    Dim u As Range
+    Set u = ActiveSheet.Range(Cells(3, 1), Cells(3, 1))
+    Set sizeBtn = ActiveSheet.Buttons.Add(u.Left, u.Top, u.Width, u.Height)
+    With sizeBtn
+      .OnAction = "Sheet1.setSize"
+      .Caption = Cells(3, 1).Text
+      .Name = "setsize"
+    End With
+    
+    
+  Application.ScreenUpdating = True
 End Sub
 
 Private Sub ClearBoard()
@@ -84,7 +122,7 @@ Private Sub ClearBoard()
     Size.Interior.ColorIndex = 15
     Size.NumberFormat = ";;;"
     Size.FormulaHidden = True
-    
+    Call addButtons
 
 End Sub
 
@@ -274,3 +312,4 @@ Private Function openAllEmpty()
     
     
 End Function
+
